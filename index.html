@@ -222,12 +222,8 @@
   // Lead-Endpoint (Serverless-Proxy → Brevo-Liste "TheSkai Zahnarzt Freebie").
   var LEAD_ENDPOINT = "/.netlify/functions/lead";
   function showThanks(){
-    document.getElementById('leadForm').style.display = 'none';
-    var t = document.getElementById('thanks');
-    t.style.display = 'block';
-    var cb = document.getElementById('callBtn');
-    if(CALENDLY_URL && CALENDLY_URL !== "#"){ cb.setAttribute('href', CALENDLY_URL); }
-    t.scrollIntoView({behavior:'smooth', block:'center'});
+    // Weiterleitung auf eigene Danke-Seite mit Calendly-CTA.
+    window.location.href = "danke.html";
   }
   document.getElementById('leadForm').addEventListener('submit', function(e){
     e.preventDefault();

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Danke – Ihr Report ist unterwegs | The Power of AI</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#000;--ink:#f4f4f7;--muted:#9a9aab;--line:rgba(255,255,255,.09);--acc:#a557ff;--acc-2:#6d3bd4;--navy:#0d1739;--max:1080px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Albert Sans',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+  body::before{content:"";position:fixed;inset:0;z-index:-2;background:url('assets/background.jpg') center/cover no-repeat}
+  body::after{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(120deg,rgba(0,0,0,.88) 0%,rgba(0,0,0,.48) 50%,rgba(0,0,0,.8) 100%)}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3{line-height:1.1;letter-spacing:-.025em;font-weight:900}
+  .grad{background:linear-gradient(100deg,#fff 30%,var(--acc) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  header{position:sticky;top:0;z-index:50;background:rgba(0,0,0,.7);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .nav{max-width:var(--max);margin:0 auto;padding:0 22px;display:flex;align-items:center;height:66px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;letter-spacing:-.02em}
+  .logo .dot{width:11px;height:11px;border-radius:50%;background:linear-gradient(135deg,var(--acc),#e0c3ff);box-shadow:0 0 14px 2px rgba(165,87,255,.7)}
+  main{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 22px}
+  .card{max-width:640px;width:100%;text-align:center;background:linear-gradient(150deg,var(--navy) 20%,#3a2470 70%,var(--acc-2) 130%);border:1px solid rgba(165,87,255,.35);border-radius:26px;padding:52px 40px}
+  @media(max-width:600px){.card{padding:38px 24px}}
+  .big{font-size:3.4rem;margin-bottom:8px}
+  .card h1{font-size:clamp(1.9rem,5vw,2.6rem);margin-bottom:14px}
+  .lead{color:#e2ddf3;font-size:1.08rem;margin-bottom:8px}
+  .sub{color:#c9b8ef;font-size:.98rem;margin:22px 0 6px}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-family:inherit;font-weight:700;font-size:1.05rem;padding:16px 30px;border-radius:999px;border:1px solid transparent;cursor:pointer;transition:.2s;margin-top:20px;width:100%;justify-content:center}
+  .btn-primary{background:linear-gradient(135deg,var(--acc),var(--acc-2));color:#fff;box-shadow:0 10px 34px rgba(165,87,255,.4)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 44px rgba(165,87,255,.55)}
+  .end{color:#b9b3cc;font-size:.86rem;margin-top:14px}
+  .back{display:inline-block;margin-top:26px;color:#c9a5ff;font-size:.9rem;border-bottom:1px solid rgba(201,165,255,.4)}
+  footer{text-align:center;color:var(--muted);font-size:.82rem;padding:26px}
+</style>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <div class="logo"><span class="dot"></span>The&nbsp;Power&nbsp;of&nbsp;AI</div>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="big">🎉</div>
+    <h1>Ihr Report ist <span class="grad">unterwegs!</span></h1>
+    <p class="lead">Vielen Dank – wir haben Ihre Anfrage erhalten. Der Report landet in Kürze in Ihrem Postfach (bitte auch den Spam-Ordner prüfen).</p>
+
+    <p class="sub">Der beste nächste Schritt:</p>
+    <p class="lead">In einem kostenlosen 15-Minuten-Gespräch schauen wir uns Ihre Praxis konkret an – unverbindlich, Sie entscheiden danach in Ruhe.</p>
+
+    <!-- Calendly-Link hier eintragen: -->
+    <a href="CALENDLY_URL_HIER" id="callBtn" class="btn btn-primary" target="_blank" rel="noopener">Kostenloses Erstgespräch buchen →</a>
+    <div class="end">Nur 15 Minuten – ganz unverbindlich.</div>
+
+    <a href="index.html" class="back">← Zurück zur Startseite</a>
+  </div>
+</main>
+
+<footer>© 2026 The Power of AI</footer>
+</body>
+</html>
