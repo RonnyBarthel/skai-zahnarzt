@@ -219,17 +219,40 @@
 <script>
   // Platzhalter – später durch echten Calendly-/Buchungslink ersetzen
   var CALENDLY_URL = "#";
-  document.getElementById('leadForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    var f = e.target;
-    if(!f.checkValidity()){ f.reportValidity(); return; }
-    // TODO: Lead an Brevo senden (API/Formular-Endpoint).
+  // Lead-Endpoint (Serverless-Proxy → Brevo-Liste "TheSkai Zahnarzt Freebie").
+  var LEAD_ENDPOINT = "/.netlify/functions/lead";
+  function showThanks(){
     document.getElementById('leadForm').style.display = 'none';
     var t = document.getElementById('thanks');
     t.style.display = 'block';
     var cb = document.getElementById('callBtn');
     if(CALENDLY_URL && CALENDLY_URL !== "#"){ cb.setAttribute('href', CALENDLY_URL); }
     t.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+  document.getElementById('leadForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var f = e.target;
+    if(!f.checkValidity()){ f.reportValidity(); return; }
+    var btn = f.querySelector('button[type=submit]');
+    if(btn){ btn.disabled = true; btn.textContent = 'Wird gesendet …'; }
+    fetch(LEAD_ENDPOINT, {
+      method: 'POST',
+      headers: {'content-type':'application/json'},
+      body: JSON.stringify({
+        name: f.name.value,
+        email: f.email.value,
+        tel: f.tel.value
+      })
+    })
+    .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {ok:r.ok, j:j}; }); })
+    .then(function(res){
+      if(res.ok && res.j && res.j.ok){ showThanks(); }
+      else { if(btn){ btn.disabled=false; btn.textContent='Report jetzt herunterladen ↓'; } alert('Ups, das hat nicht geklappt. Bitte kurz erneut versuchen.'); }
+    })
+    .catch(function(){
+      if(btn){ btn.disabled=false; btn.textContent='Report jetzt herunterladen ↓'; }
+      alert('Verbindungsproblem. Bitte kurz erneut versuchen.');
+    });
   });
 </script>
 </body>
