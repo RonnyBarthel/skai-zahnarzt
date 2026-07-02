@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Lead-Ansicht | intern</title>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#08080c;--panel:#0f0f17;--line:rgba(255,255,255,.10);--ink:#f2f2f6;--muted:#9a9aab;--acc:#a557ff;--acc2:#6d3bd4;--ok:#3ecf8e;--open:#e0b64a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Albert Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.4;padding:18px}
+  h1{font-size:1.4rem;font-weight:800;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:.85rem;margin-top:2px}
+  .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0}
+  input,select{font-family:inherit;font-size:.9rem;background:#050508;color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
+  input:focus,select:focus{outline:none;border-color:var(--acc)}
+  #search{min-width:230px;flex:1}
+  .btn{font-family:inherit;font-weight:700;font-size:.88rem;padding:9px 16px;border-radius:9px;border:1px solid transparent;cursor:pointer;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+  .btn.ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+  .stats{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin:6px 0 14px;font-size:.9rem;color:var(--muted)}
+  .stats b{color:var(--ink)}
+  .prog{flex:1;min-width:180px;height:9px;background:#1a1a26;border-radius:99px;overflow:hidden}
+  .prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),#7ee6b6);width:0}
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:.85rem;white-space:nowrap}
+  thead th{position:sticky;top:0;background:#14141d;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;font-weight:700}
+  thead th:hover{color:var(--acc)}
+  th .ar{color:var(--acc);font-size:.7rem}
+  tbody td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.05)}
+  tbody tr:hover{background:rgba(165,87,255,.06)}
+  a{color:#c9a5ff}
+  .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.75rem;font-weight:700}
+  .st-offen{background:rgba(224,182,74,.15);color:var(--open)}
+  .st-angeschrieben{background:rgba(62,207,142,.15);color:var(--ok)}
+  .st-geantwortet{background:rgba(165,87,255,.18);color:#c9a5ff}
+  .lst{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.72rem;background:rgba(255,255,255,.08);margin-right:4px}
+  #gate{max-width:420px;margin:12vh auto;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:34px}
+  #gate input{width:100%;margin:14px 0;text-align:center}
+  .msg{color:var(--muted);text-align:center;padding:40px}
+  .hide{display:none}
+</style>
+</head>
+<body>
+
+<div id="gate" class="hide">
+  <h1>🔒 Lead-Ansicht</h1>
+  <p class="sub">Zugangscode eingeben</p>
+  <input id="gateInput" type="password" placeholder="Zugangscode" autocomplete="off">
+  <button class="btn" id="gateBtn" style="width:100%">Öffnen</button>
+  <p class="sub" id="gateErr" style="color:#ff8080;margin-top:10px"></p>
+</div>
+
+<div id="app" class="hide">
+  <h1>Lead-Ansicht <span class="sub" style="font-weight:400">· TheSkai Zahnärzte</span></h1>
+  <div class="sub">Live aus Brevo · nur intern</div>
+
+  <div class="bar">
+    <input id="search" type="text" placeholder="🔎 Suche über alle Spalten …">
+    <select id="fList"><option value="">Alle Listen</option></select>
+    <select id="fCountry"><option value="">Alle Länder</option></select>
+    <select id="fStatus"><option value="">Alle Status</option></select>
+    <select id="fPremium"><option value="">Premium egal</option><option value="ja">nur Premium</option><option value="nein">kein Premium</option></select>
+    <button class="btn ghost" id="reset">Filter zurücksetzen</button>
+    <button class="btn" id="csv">CSV export</button>
+  </div>
+
+  <div class="stats">
+    <span><b id="cShown">0</b> von <b id="cTotal">0</b> Kontakten</span>
+    <span>angeschrieben <b id="cDone">0</b> · offen <b id="cOpen">0</b> · geantwortet <b id="cAns">0</b></span>
+    <span class="prog"><i id="progBar"></i></span>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr id="head"></tr></thead>
+      <tbody id="body"></tbody>
+    </table>
+  </div>
+  <p class="sub" id="empty" style="margin-top:14px"></p>
+</div>
+
+<script>
+const COLS = [
+  {k:'status',   t:'Status'},
+  {k:'firstname',t:'Vorname'},
+  {k:'lastname', t:'Nachname'},
+  {k:'title',    t:'Titel'},
+  {k:'company',  t:'Firma'},
+  {k:'jobtitle', t:'Position'},
+  {k:'location', t:'Ort'},
+  {k:'country',  t:'Land'},
+  {k:'premium',  t:'Premium'},
+  {k:'source',   t:'Quelle'},
+  {k:'lists',    t:'Liste'},
+  {k:'email',    t:'E-Mail'},
+  {k:'linkedin', t:'LinkedIn'},
+  {k:'lastEmailed',t:'angemailt am'},
+];
+let DATA = [], sortKey='lastname', sortDir=1;
+
+function tokenFromHash(){ return decodeURIComponent((location.hash||'').replace(/^#/,'')).trim(); }
+
+async function load(token){
+  const res = await fetch('/.netlify/functions/leads', { headers: { 'x-access-token': token } });
+  if(res.status===401){ throw new Error('Zugangscode ungültig'); }
+  if(!res.ok){ const t=await res.text(); throw new Error('Fehler '+res.status+' '+t); }
+  const j = await res.json();
+  return j.rows||[];
+}
+
+function uniq(arr){ return Array.from(new Set(arr.filter(Boolean))).sort(); }
+
+function initFilters(){
+  const c=document.getElementById('fCountry'), l=document.getElementById('fList'), s=document.getElementById('fStatus');
+  uniq(DATA.map(r=>r.country)).forEach(v=>c.add(new Option(v,v)));
+  uniq(DATA.flatMap(r=>r.lists)).forEach(v=>l.add(new Option(v,v)));
+  uniq(DATA.map(r=>r.status||'offen')).forEach(v=>s.add(new Option(v,v)));
+}
+
+function head(){
+  const tr=document.getElementById('head'); tr.innerHTML='';
+  COLS.forEach(col=>{
+    const th=document.createElement('th');
+    th.innerHTML=col.t+' <span class="ar">'+(sortKey===col.k?(sortDir>0?'▲':'▼'):'')+'</span>';
+    th.onclick=()=>{ if(sortKey===col.k)sortDir*=-1; else {sortKey=col.k;sortDir=1;} render(); };
+    tr.appendChild(th);
+  });
+}
+
+function val(r,k){ return k==='lists' ? r.lists.join(', ') : (r[k]||''); }
+
+function filtered(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  const fc=document.getElementById('fCountry').value;
+  const fl=document.getElementById('fList').value;
+  const fs=document.getElementById('fStatus').value;
+  const fp=document.getElementById('fPremium').value;
+  let rows=DATA.filter(r=>{
+    if(fc && r.country!==fc) return false;
+    if(fl && !r.lists.includes(fl)) return false;
+    if(fs && (r.status||'offen')!==fs) return false;
+    if(fp){ const prem=/1|ja|true|yes|premium/i.test(r.premium); if(fp==='ja'&&!prem)return false; if(fp==='nein'&&prem)return false; }
+    if(q){ const hay=COLS.map(c=>val(r,c.k)).join(' ').toLowerCase(); if(!hay.includes(q))return false; }
+    return true;
+  });
+  rows.sort((a,b)=>{ const x=(''+val(a,sortKey)).toLowerCase(), y=(''+val(b,sortKey)).toLowerCase(); return x<y?-sortDir:x>y?sortDir:0; });
+  return rows;
+}
+
+function cell(r,k){
+  const v=val(r,k);
+  if(k==='status'){ const s=r.status||'offen'; return '<span class="pill st-'+s.replace(/[^a-z]/gi,'')+'">'+s+'</span>'; }
+  if(k==='lists'){ return r.lists.map(x=>'<span class="lst">'+x+'</span>').join(''); }
+  if(k==='email'){ return '<a href="mailto:'+v+'">'+v+'</a>'; }
+  if(k==='linkedin' && v){ return '<a href="'+v+'" target="_blank" rel="noopener">Profil ↗</a>'; }
+  if(k==='premium'){ return /1|ja|true|yes|premium/i.test(v)?'⭐':''; }
+  return v.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+}
+
+function render(){
+  head();
+  const rows=filtered();
+  const body=document.getElementById('body'); body.innerHTML='';
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=COLS.map(c=>'<td>'+cell(r,c.k)+'</td>').join('');
+    body.appendChild(tr);
+  });
+  const done=DATA.filter(r=>(r.status||'offen')==='angeschrieben').length;
+  const ans=DATA.filter(r=>(r.status||'offen')==='geantwortet').length;
+  const open=DATA.length-done-ans;
+  document.getElementById('cShown').textContent=rows.length;
+  document.getElementById('cTotal').textContent=DATA.length;
+  document.getElementById('cDone').textContent=done;
+  document.getElementById('cOpen').textContent=open;
+  document.getElementById('cAns').textContent=ans;
+  document.getElementById('progBar').style.width=DATA.length?Math.round((done+ans)/DATA.length*100)+'%':'0';
+  document.getElementById('empty').textContent=rows.length?'':'Keine Treffer für die aktuellen Filter.';
+}
+
+function toCSV(){
+  const rows=filtered();
+  const head=COLS.map(c=>c.t).join(';');
+  const lines=rows.map(r=>COLS.map(c=>{ let v=(''+val(r,c.k)).replace(/"/g,'""'); return /[";\n]/.test(v)?'"'+v+'"':v; }).join(';'));
+  const csv='﻿'+[head,...lines].join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='leads-theskai.csv'; a.click();
+}
+
+function start(token){
+  document.getElementById('gate').classList.add('hide');
+  document.getElementById('app').classList.remove('hide');
+  document.getElementById('empty').textContent='Lade Leads …';
+  load(token).then(rows=>{
+    DATA=rows; initFilters(); render();
+    ['search','fCountry','fList','fStatus','fPremium'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+    document.getElementById('reset').onclick=()=>{ document.getElementById('search').value=''; ['fCountry','fList','fStatus','fPremium'].forEach(id=>document.getElementById(id).value=''); render(); };
+    document.getElementById('csv').onclick=toCSV;
+  }).catch(err=>{
+    document.getElementById('app').classList.add('hide');
+    showGate(err.message);
+  });
+}
+
+function showGate(msg){
+  document.getElementById('gate').classList.remove('hide');
+  document.getElementById('gateErr').textContent=msg||'';
+  document.getElementById('gateBtn').onclick=()=>{
+    const t=document.getElementById('gateInput').value.trim();
+    if(t){ location.hash=encodeURIComponent(t); start(t); }
+  };
+  document.getElementById('gateInput').addEventListener('keydown',e=>{ if(e.key==='Enter')document.getElementById('gateBtn').click(); });
+}
+
+const tok=tokenFromHash();
+if(tok) start(tok); else showGate('');
+</script>
+</body>
+</html>
