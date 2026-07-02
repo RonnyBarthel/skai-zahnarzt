@@ -37,8 +37,8 @@ exports.handler = async (event) => {
     attributes: {
       FIRSTNAME: firstname,
       LASTNAME: lastname,
-      // Telefon als reines Textfeld (SMS-Feld verlangt +49-Format und würde 0151-Nummern ablehnen).
-      LANDLINE_NUMBER: (data.tel || '').trim() || undefined,
+      // Telefon in freies Textfeld TELEFON (SMS/LANDLINE_NUMBER erzwingen +49-Format).
+      TELEFON: (data.tel || '').trim() || undefined,
       SOURCE: 'LP Zahnarzt Freebie',
     },
     listIds: [LIST_ID],
